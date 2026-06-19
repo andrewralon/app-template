@@ -1,0 +1,11 @@
+# fastlane/Appfile
+# These are the default values used by fastlane actions that need app identity.
+# They can be overridden per-lane with explicit parameters.
+
+app_identifier "__BUNDLE_ID__"
+apple_id "__APPLE_ID__"
+team_id "__TEAM_ID__"
+
+# If your App Store Connect team ID differs from your Developer Portal team ID,
+# set itc_team_id separately:
+# itc_team_id "__ITC_TEAM_ID__"

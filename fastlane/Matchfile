@@ -1,0 +1,21 @@
+# fastlane/Matchfile
+# Manages code signing certificates and provisioning profiles via a private git repo.
+# Run: bundle exec fastlane match init  (first time)
+#      bundle exec fastlane match development
+#      bundle exec fastlane match appstore
+
+git_url "__MATCH_REPO__"
+storage_mode "git"
+
+app_identifier ["__BUNDLE_ID__"]
+username "__APPLE_ID__"
+team_id "__TEAM_ID__"
+
+# Always use readonly on CI. Locally, this can be false to allow creating new certs.
+# readonly(is_ci)
+
+# Platform (ios, macos, tvos, watchos)
+platform "ios"
+
+# Verbose output for debugging
+# verbose(true)

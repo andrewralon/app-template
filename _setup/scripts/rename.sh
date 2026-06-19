@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+# rename.sh — Replace all __PLACEHOLDER__ tokens in the template
+#
+# Usage: rename.sh "KEY=VALUE" "KEY2=VALUE2" ...
+# Example:
+#   rename.sh \
+#     "__APP_NAME__=WeatherNow" \
+#     "__APP_DISPLAY_NAME__=Weather Now" \
+#     "__BUNDLE_ID__=com.acme.weathernow" \
+#     "__ORG_IDENTIFIER__=com.acme" \
+#     "__TEAM_ID__=ABCD123456" \
+#     "__APPLE_ID__=dev@acme.com" \
+#     "__MATCH_REPO__=git@github.com:acme/certs.git" \
+#     "__YEAR__=2026"
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+
+# --- Parse key=value arguments ---
+declare -A replacements
+for arg in "$@"; do
+  key="${arg%%=*}"
+  value="${arg#*=}"
+  replacements["$key"]="$value"
+done
+
+if [ ${#replacements[@]} -eq 0 ]; then
+  echo "Error: No replacements provided."
+  echo "Usage: $0 \"__KEY__=value\" ..."
+  exit 1
+fi
+
+echo "Repo root: $REPO_ROOT"
+echo "Replacements:"
+for key in "${!replacements[@]}"; do
+  echo "  $key → ${replacements[$key]}"
+done
+echo ""
+
+# --- File extensions to process ---
+EXTENSIONS=("swift" "yml" "yaml" "md" "plist" "rb" "sh" "json" "txt" "xcconfig" "strings")
+
+# --- Build find arguments ---
+FIND_ARGS=()
+for ext in "${EXTENSIONS[@]}"; do
+  FIND_ARGS+=("-name" "*.${ext}" "-o")
+done
+# Remove trailing -o
+unset 'FIND_ARGS[${#FIND_ARGS[@]}-1]'
+
+# --- Perform replacements in file contents ---
+echo "Replacing in file contents..."
+while IFS= read -r -d '' file; do
+  for key in "${!replacements[@]}"; do
+    value="${replacements[$key]}"
+    # Escape special sed characters in value
+    escaped_value=$(printf '%s' "$value" | sed 's/[\/&]/\\&/g')
+    if grep -qF "$key" "$file" 2>/dev/null; then
+      sed -i '' "s|${key}|${escaped_value}|g" "$file"
+      echo "  Updated: $file"
+    fi
+  done
+done < <(find "$REPO_ROOT" \
+  -not -path "*/\.*" \
+  -not -path "*/_build/*" \
+  -not -path "*/node_modules/*" \
+  \( "${FIND_ARGS[@]}" \) \
+  -print0)
+
+# --- Rename directories ---
+echo ""
+echo "Renaming directories..."
+# Must rename deepest paths first (sort -r handles this by depth)
+if [ -n "${replacements[__APP_NAME__]+x}" ]; then
+  APP_NAME="${replacements[__APP_NAME__]}"
+
+  # Find all directories containing __APP_NAME__ and rename them
+  while IFS= read -r dir; do
+    parent="$(dirname "$dir")"
+    base="$(basename "$dir")"
+    new_base="${base//__APP_NAME__/$APP_NAME}"
+    if [ "$base" != "$new_base" ]; then
+      mv "$dir" "$parent/$new_base"
+      echo "  Renamed dir: $dir → $parent/$new_base"
+    fi
+  done < <(find "$REPO_ROOT/App" -depth -type d -name "*__APP_NAME__*" 2>/dev/null | sort -r)
+fi
+
+# --- Rename files ---
+echo ""
+echo "Renaming files..."
+if [ -n "${replacements[__APP_NAME__]+x}" ]; then
+  APP_NAME="${replacements[__APP_NAME__]}"
+
+  while IFS= read -r file; do
+    parent="$(dirname "$file")"
+    base="$(basename "$file")"
+    new_base="${base//__APP_NAME__/$APP_NAME}"
+    if [ "$base" != "$new_base" ]; then
+      mv "$file" "$parent/$new_base"
+      echo "  Renamed file: $file → $parent/$new_base"
+    fi
+  done < <(find "$REPO_ROOT/App" -type f -name "*__APP_NAME__*" 2>/dev/null)
+fi
+
+echo ""
+echo "Done! All placeholders replaced."
+echo ""
+echo "Next steps:"
+echo "  1. cd App && xcodegen generate"
+echo "  2. open App/${replacements[__APP_NAME__]:-__APP_NAME__}.xcodeproj"

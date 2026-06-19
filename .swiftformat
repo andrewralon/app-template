@@ -1,0 +1,41 @@
+--swiftversion 5.10
+
+# Indentation
+--indent 4
+--indentcase false
+--xcodeindentation enabled
+
+# Spacing
+--trimwhitespace always
+--linebreaks lf
+--maxwidth 120
+
+# Wrapping
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--wrapreturntype if-multiline
+
+# Braces
+--allman false
+--elseposition same-line
+
+# Imports
+--importgrouping testable-bottom
+
+# Self
+--self init-only
+
+# Rules — disable ones that conflict with common Swift style
+--disable redundantSelf
+--disable unusedArguments  # let the linter handle this
+--disable trailingCommas   # personal preference
+
+# Enabled extra rules
+--enable blankLineAfterImports
+--enable blankLinesAroundMark
+--enable blockComments
+--enable isEmpty
+--enable markTypes
+--enable sortedSwitchCases
+--enable wrapMultilineStatementBraces

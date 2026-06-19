@@ -1,0 +1,240 @@
+# fastlane/Fastfile
+# Available lanes:
+#   bundle exec fastlane test          → Run all tests
+#   bundle exec fastlane beta          → Build and upload to TestFlight
+#   bundle exec fastlane release       → Submit to App Store
+#   bundle exec fastlane screenshots   → Generate App Store screenshots
+#   bundle exec fastlane sync_signing  → Sync code signing certs
+
+default_platform(:ios)
+
+platform :ios do
+
+  # ── Before any lane ──────────────────────────────────────────────────────
+
+  before_all do |lane|
+    # Skip clean check on signing-only lanes
+    next if [:sync_dev_signing, :sync_release_signing].include?(lane)
+  end
+
+  # ── Signing ──────────────────────────────────────────────────────────────
+
+  desc "Sync development code signing"
+  lane :sync_dev_signing do
+    match(
+      type: "development",
+      readonly: is_ci,
+      verbose: false
+    )
+  end
+
+  desc "Sync App Store code signing"
+  lane :sync_release_signing do
+    match(
+      type: "appstore",
+      readonly: is_ci,
+      verbose: false
+    )
+  end
+
+  # ── Testing ───────────────────────────────────────────────────────────────
+
+  desc "Run all unit and UI tests"
+  lane :test do
+    run_tests(
+      project: "App/__APP_NAME__.xcodeproj",
+      scheme: "__APP_NAME__",
+      devices: ["iPhone 16 Pro"],
+      clean: false,
+      result_bundle: true,
+      output_directory: "fastlane/test_output",
+      output_files: "report.html,report.junit",
+      fail_build: true
+    )
+  end
+
+  # ── TestFlight ────────────────────────────────────────────────────────────
+
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    sync_release_signing
+
+    # Read build number from TestFlight and increment
+    api_key = app_store_connect_api_key_from_env
+    current_build = latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: "__BUNDLE_ID__",
+      version: get_version_number(
+        xcodeproj: "App/__APP_NAME__.xcodeproj",
+        target: "__APP_NAME__"
+      )
+    )
+    increment_build_number(
+      build_number: current_build + 1,
+      xcodeproj: "App/__APP_NAME__.xcodeproj"
+    )
+
+    build_app(
+      project: "App/__APP_NAME__.xcodeproj",
+      scheme: "__APP_NAME__",
+      configuration: "Release",
+      output_directory: "build",
+      output_name: "__APP_NAME__.ipa",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "__BUNDLE_ID__" => "match AppStore __BUNDLE_ID__"
+        }
+      }
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: "build/__APP_NAME__.ipa",
+      skip_waiting_for_build_processing: true,
+      changelog: "Bug fixes and improvements"
+    )
+
+    clean_build_artifacts
+    commit_version_bump(
+      message: "chore: bump build number [ci skip]",
+      xcodeproj: "App/__APP_NAME__.xcodeproj",
+      force: true
+    )
+  end
+
+  # ── App Store Release ─────────────────────────────────────────────────────
+
+  desc "Build and submit to App Store"
+  lane :release do
+    test
+
+    sync_release_signing
+
+    api_key = app_store_connect_api_key_from_env
+    current_build = latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: "__BUNDLE_ID__"
+    )
+    increment_build_number(
+      build_number: current_build + 1,
+      xcodeproj: "App/__APP_NAME__.xcodeproj"
+    )
+
+    build_app(
+      project: "App/__APP_NAME__.xcodeproj",
+      scheme: "__APP_NAME__",
+      configuration: "Release",
+      output_directory: "build",
+      output_name: "__APP_NAME__.ipa",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "__BUNDLE_ID__" => "match AppStore __BUNDLE_ID__"
+        }
+      }
+    )
+
+    upload_to_app_store(
+      api_key: api_key,
+      ipa: "build/__APP_NAME__.ipa",
+      submit_for_review: true,
+      automatic_release: false,
+      force: true,
+      skip_screenshots: false,
+      skip_metadata: false,
+      submission_information: {
+        export_compliance_uses_encryption: false,
+        add_id_info_uses_idfa: false
+      }
+    )
+
+    clean_build_artifacts
+    commit_version_bump(
+      message: "chore: bump build number [ci skip]",
+      xcodeproj: "App/__APP_NAME__.xcodeproj",
+      force: true
+    )
+  end
+
+  # ── Screenshots ───────────────────────────────────────────────────────────
+
+  desc "Generate App Store screenshots"
+  lane :screenshots do
+    capture_screenshots(
+      project: "App/__APP_NAME__.xcodeproj",
+      scheme: "__APP_NAME__UITests",
+      devices: [
+        "iPhone 16 Pro Max",
+        "iPhone 8 Plus",
+        "iPad Pro (12.9-inch) (6th generation)"
+      ],
+      languages: ["en-US"],
+      output_directory: "fastlane/screenshots",
+      clear_previous_screenshots: true,
+      override_status_bar: true,
+      concurrent_simulators: false  # set to true for speed if you have enough RAM
+    )
+
+    frame_screenshots(
+      white: true,
+      path: "fastlane/screenshots"
+    )
+  end
+
+  desc "Upload screenshots to App Store Connect (no binary upload)"
+  lane :upload_screenshots do
+    api_key = app_store_connect_api_key_from_env
+    deliver(
+      api_key: api_key,
+      skip_binary_upload: true,
+      skip_metadata: true,
+      force: true
+    )
+  end
+
+  # ── Utilities ─────────────────────────────────────────────────────────────
+
+  desc "Download dSYMs for crash symbolication"
+  lane :download_dsyms do
+    api_key = app_store_connect_api_key_from_env
+    download_dsyms(
+      api_key: api_key,
+      app_identifier: "__BUNDLE_ID__",
+      version: "latest",
+      output_directory: "dSYMs"
+    )
+  end
+
+  desc "Rotate match certificates (if compromised)"
+  lane :rotate_certs do
+    match_nuke(type: "development")
+    match_nuke(type: "distribution")
+    match(type: "development")
+    match(type: "appstore")
+  end
+
+  # ── Private helpers ───────────────────────────────────────────────────────
+
+  private_lane :app_store_connect_api_key_from_env do
+    app_store_connect_api_key(
+      key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
+      issuer_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ISSUER_ID"),
+      key_content: ENV.fetch("APP_STORE_CONNECT_API_KEY_CONTENT"),
+      is_key_content_base64: true
+    )
+  end
+
+  # ── Error handling ────────────────────────────────────────────────────────
+
+  error do |lane, exception|
+    UI.error("Lane '#{lane}' failed: #{exception.message}")
+    # Uncomment to send Slack notifications on failure:
+    # slack(
+    #   message: "❌ Lane '#{lane}' failed: #{exception.message}",
+    #   success: false,
+    #   slack_url: ENV["SLACK_WEBHOOK_URL"]
+    # )
+  end
+
+end
