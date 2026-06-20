@@ -8,20 +8,42 @@ A fill-in-the-blank template for Swift/SwiftUI apps targeting iOS 17+ and/or mac
 
 ## Placeholders to Replace
 
-Every file in this repo may contain these tokens — replace them all when setting up:
+There are two categories: **file placeholders** (replaced by `rename.sh` in committed files) and **env vars** (written to `fastlane/.env` only — never committed).
+
+### File Placeholders — replaced in committed files
 
 | Token | Meaning |
 |---|---|
-| `__APP_NAME__` | PascalCase product name (no spaces, no special chars). Used as Xcode target name and Swift type prefix. Example: `WeatherNow` |
-| `__APP_DISPLAY_NAME__` | Human display name shown on the device. Example: `Weather Now` |
+| `__APP_NAME__` | PascalCase target name (no spaces). Used as Xcode target and Swift type prefix. Example: `WeatherNow` |
+| `__APP_DISPLAY_NAME__` | Human display name shown on device. Example: `Weather Now` |
+| `__APP_NAME_INITIAL__` | First letter of `__APP_NAME__`, used in placeholder icon and docs |
 | `__BUNDLE_ID__` | Full reverse-DNS bundle ID. Example: `com.acme.weathernow` |
-| `__ORG_IDENTIFIER__` | Bundle prefix only. Example: `com.acme` |
-| `__TEAM_ID__` | 10-character Apple Developer Team ID (find in developer.apple.com → Membership) |
-| `__APPLE_ID__` | Apple ID email used for App Store Connect |
-| `__MATCH_REPO__` | SSH URL to a *private* git repo that fastlane match will use for certificates |
+| `__ORG_IDENTIFIER__` | Bundle ID prefix only. Example: `com.acme` |
+| `__TEAM_ID__` | 10-char Apple Developer Team ID. Example: `ABCD123456`. Used in `project.yml` (DEVELOPMENT_TEAM) and `ExportOptions.plist`. |
 | `__YEAR__` | Four-digit current year |
+| `__GH_USERNAME__` | GitHub username or org (used in GitHub Pages URLs) |
+| `__APP_REPO_NAME__` | GitHub repo slug (used in GitHub Pages URLs) |
+| `__SUPPORT_URL__` | Full support page URL, e.g. `https://user.github.io/myapp/support` |
+| `__PRIVACY_URL__` | Full privacy policy URL, e.g. `https://user.github.io/myapp/privacy` |
+| `__CONTACT_EMAIL__` | Public-facing support email shown on the support page |
+| `__APP_STORE_URL__` | App Store link (fill in after publishing) |
+| `__PRIVACY_LAST_UPDATED__` | Date the privacy policy was last updated |
+| `__DEVELOPER_NAME__` | Developer/company name shown in privacy policy |
 
-Use `_setup/scripts/rename.sh` to replace all at once. Never commit secrets — `__MATCH_REPO__` goes in the Matchfile, credentials go in env vars or a `.env` file (gitignored).
+### Personal Info — goes in `fastlane/.env` only, never committed
+
+| Env Var | Meaning |
+|---|---|
+| `APPLE_ID` | Apple ID email for App Store Connect authentication |
+| `APPLE_TEAM_ID` | 10-char Apple Developer Team ID |
+| `MATCH_GIT_URL` | SSH URL to the private certs repo for fastlane match |
+| `MATCH_PASSWORD` | Passphrase to encrypt/decrypt the match certs repo |
+| `APP_STORE_CONNECT_API_KEY_ID` | API key ID from App Store Connect |
+| `APP_STORE_CONNECT_API_KEY_ISSUER_ID` | API key issuer ID |
+| `APP_STORE_CONNECT_API_KEY_PATH` | Local path to the `.p8` key file |
+| `APP_STORE_CONNECT_API_KEY_CONTENT` | Base64-encoded `.p8` contents (for CI) |
+
+Use `_setup/scripts/rename.sh` to replace file placeholders. For env vars, copy `fastlane/.env.template` → `fastlane/.env` and fill in the values. `init.sh` does both automatically.
 
 ## Key Files to Know
 
@@ -34,13 +56,14 @@ Use `_setup/scripts/rename.sh` to replace all at once. Never commit secrets — 
 
 ## Workflow Overview
 
-1. **Rename** — run `_setup/scripts/init.sh` to fill in all placeholders
-2. **Generate** — run `xcodegen generate` inside `App/` to create the .xcodeproj
+1. **Init** — run `_setup/scripts/init.sh` (creates repo, fills placeholders, generates project, sets up .env, enables Pages)
+2. **Fill secrets** — open `fastlane/.env` and fill in MATCH_PASSWORD and App Store Connect API key values
 3. **Open** — open `App/__APP_NAME__.xcodeproj` in Xcode and build/run
 4. **Configure signing** — run `bundle exec fastlane match development` to pull/create certs
-5. **Test on device** — select real device in Xcode, ⌘R
-6. **Submit to TestFlight** — `bundle exec fastlane beta`
-7. **Submit to App Store** — `bundle exec fastlane release`
+5. **Customize docs/** — edit `docs/support.html` and `docs/privacy.html` with real content
+6. **Test on device** — select real device in Xcode, ⌘R
+7. **Submit to TestFlight** — `bundle exec fastlane beta`
+8. **Submit to App Store** — `bundle exec fastlane release`
 
 ## What You Should and Shouldn't Do
 
@@ -61,6 +84,22 @@ Use `_setup/scripts/rename.sh` to replace all at once. Never commit secrets — 
 ## Useful Commands
 
 ```bash
+# Run the full setup wizard (do this first)
+./_setup/scripts/init.sh
+
+# Create a GitHub repo (if not done by init.sh)
+gh repo create USERNAME/REPONAME --public --source=. --remote=origin --push
+
+# Create the private certs repo for fastlane match
+gh repo create USERNAME/APPNAME-certs --private
+
+# Enable GitHub Pages for docs/ folder
+gh api repos/USERNAME/REPONAME/pages --method POST \
+  -f source='{"branch":"main","path":"/docs"}'
+
+# Copy .env template and fill in secrets
+cp fastlane/.env.template fastlane/.env && $EDITOR fastlane/.env
+
 # Generate Xcode project from project.yml
 cd App && xcodegen generate
 

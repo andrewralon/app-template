@@ -77,7 +77,7 @@ bundle exec fastlane run deliver submit_for_review:true
 
 ```ruby
 app_identifier "__BUNDLE_ID__"
-username "__APPLE_ID__"
+username ENV.fetch("APPLE_ID", "")  # set in fastlane/.env, never committed
 
 submit_for_review true
 automatic_release false  # manually release after approval

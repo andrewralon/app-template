@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Support for __APP_DISPLAY_NAME__">
+  <title>Support — __APP_DISPLAY_NAME__</title>
+  <style>
+    :root {
+      --accent: #007AFF;
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f7;
+      --text: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --border: #d2d2d7;
+      --radius: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --accent: #0A84FF;
+        --bg: #000000;
+        --bg-secondary: #1c1c1e;
+        --text: #f5f5f7;
+        --text-secondary: #98989d;
+        --border: #38383a;
+      }
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    nav {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand { font-weight: 600; color: var(--text); }
+    .container { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem; }
+    h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .subtitle { color: var(--text-secondary); margin-bottom: 3rem; }
+    h2 { font-size: 1.25rem; font-weight: 600; margin: 2.5rem 0 1rem; }
+    p { margin-bottom: 1rem; }
+
+    /* FAQ */
+    .faq { margin: 0; padding: 0; list-style: none; }
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+    }
+    .faq-item summary {
+      padding: 1rem 1.25rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      list-style: none;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after {
+      content: "+";
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      margin-left: 1rem;
+    }
+    .faq-item[open] summary::after { content: "−"; }
+    .faq-item[open] { background: var(--bg-secondary); }
+    .faq-answer { padding: 0 1.25rem 1.25rem; color: var(--text-secondary); font-size: 0.95rem; }
+
+    /* Contact card */
+    .contact-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+    .contact-card h2 { margin-top: 0; }
+    .contact-email {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: white;
+      padding: 0.6rem 1.25rem;
+      border-radius: 980px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-top: 0.75rem;
+    }
+    .contact-email:hover { opacity: 0.85; text-decoration: none; }
+
+    footer {
+      padding: 2rem 1.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border);
+      margin-top: 4rem;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-brand" href="index.html">← __APP_DISPLAY_NAME__</a>
+      <a href="privacy.html">Privacy Policy</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Support</h1>
+    <p class="subtitle">__APP_DISPLAY_NAME__ · Version __APP_VERSION__</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <ul class="faq">
+
+      <!-- Replace or add FAQ items that match your app's actual features -->
+      <details class="faq-item">
+        <summary>How do I get started?</summary>
+        <div class="faq-answer">
+          <p><!-- Describe the first-run experience or onboarding steps --> Open the app and [describe what to do first]. Everything else is available from the main screen.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Is my data backed up?</summary>
+        <div class="faq-answer">
+          <p><!-- Describe your data storage approach -->
+          Your data is stored locally on your device. To back it up, make sure iCloud Backup is enabled in Settings → [Your Name] → iCloud → iCloud Backup.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>How do I delete my data?</summary>
+        <div class="faq-answer">
+          <p><!-- Describe the data deletion process -->
+          You can delete all data by uninstalling the app from your device. To delete specific items, [describe the in-app process].</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>The app isn't working correctly. What should I do?</summary>
+        <div class="faq-answer">
+          <p>Try these steps in order:</p>
+          <ol style="margin-left:1.25rem;margin-top:0.5rem">
+            <li>Force-quit the app and reopen it</li>
+            <li>Restart your device</li>
+            <li>Check for an update in the App Store</li>
+            <li>If the problem persists, contact us at the email below with a description of the issue and your device model and iOS version</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>How do I request a feature or report a bug?</summary>
+        <div class="faq-answer">
+          <p>We love hearing from users. Send an email to the address below with the subject line "Feature Request" or "Bug Report" and as much detail as you can provide. Screenshots are very helpful.</p>
+        </div>
+      </details>
+
+    </ul>
+
+    <div class="contact-card">
+      <h2>Still need help?</h2>
+      <p>We typically respond within 1–2 business days.</p>
+      <a class="contact-email" href="mailto:__CONTACT_EMAIL__?subject=__APP_DISPLAY_NAME_ENCODED__%20Support">
+        ✉ Email Support
+      </a>
+    </div>
+
+  </div>
+
+  <footer>
+    © __YEAR__ __APP_DISPLAY_NAME__ ·
+    <a href="privacy.html">Privacy Policy</a>
+  </footer>
+
+</body>
+</html>

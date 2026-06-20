@@ -12,6 +12,7 @@ Work through this top to bottom. Check off each item as you complete it. Items m
 - [ ] Homebrew installed: `/bin/bash -c "$(curl -fsSL https://brew.sh/install.sh)"`
 - [ ] Core tools installed: `brew install xcodegen swiftformat swiftlint imagemagick`
 - [ ] xcodes installed: `brew install xcodesorg/made/xcodes`
+- [ ] GitHub CLI installed: `brew install gh` (then `gh auth login`)
 - [ ] rbenv + Ruby 3.3 installed (see [guide](guides/00-prerequisites.md#ruby))
 - [ ] fastlane installed: `gem install fastlane`
 - [ ] Bundler installed: `gem install bundler`
@@ -34,15 +35,35 @@ Work through this top to bottom. Check off each item as you complete it. Items m
 
 ## Phase 2 — Template Initialization
 
-- [ ] Chose your `__APP_NAME__` (PascalCase, no spaces, no special chars)
-- [ ] Chose your `__BUNDLE_ID__` (reverse-DNS, e.g. `com.yourname.appname`)
-- [ ] Chose your `__APP_DISPLAY_NAME__` (human-readable, shown on device)
-- [ ] Created a private git repo for fastlane match certificates
-- [ ] Ran `_setup/scripts/init.sh` and filled in all prompts
-- [ ] Ran `cd App && xcodegen generate` to create the Xcode project
-- [ ] Opened `App/__APP_NAME__.xcodeproj` in Xcode — builds with no errors
+The `init.sh` wizard handles most of this automatically. Run it first:
+```bash
+chmod +x _setup/scripts/init.sh && ./_setup/scripts/init.sh
+```
+
+**The wizard will:**
+- [ ] Create (or connect) the GitHub repo for your app
+- [ ] Collect: app name, display name, bundle ID, Apple ID, Team ID, contact email
+- [ ] Create a private GitHub repo for fastlane match certs (or use existing)
+- [ ] Compute and fill in GitHub Pages URLs (support + privacy)
+- [ ] Replace all `__PLACEHOLDER__` tokens throughout the project
+- [ ] Generate the Xcode project (`xcodegen generate`)
+- [ ] Generate a placeholder app icon (gradient with first letter)
+- [ ] Copy `fastlane/.env.template` → `fastlane/.env` and pre-fill known values
+- [ ] Enable GitHub Pages for the `docs/` folder
+
+**After running init.sh:**
+- [ ] Opened `App/[AppName].xcodeproj` in Xcode — builds with no errors
+- [ ] Filled in remaining secrets in `fastlane/.env`:
+  - [ ] `MATCH_PASSWORD` — passphrase for the certs repo
+  - [ ] `APP_STORE_CONNECT_API_KEY_ID`
+  - [ ] `APP_STORE_CONNECT_API_KEY_ISSUER_ID`
+  - [ ] `APP_STORE_CONNECT_API_KEY_PATH` — path to `.p8` key file
+- [ ] Customized `docs/support.html` — replaced placeholder FAQ with real content
+- [ ] Reviewed `docs/privacy.html` — updated to reflect actual data practices
+- [ ] Verified GitHub Pages live: `curl https://[username].github.io/[repo]/support`
 
 → Full details: [guides/02-xcode-project.md](guides/02-xcode-project.md)
+→ GitHub Pages: [guides/13-github-pages.md](guides/13-github-pages.md)
 
 ---
 
@@ -61,7 +82,7 @@ Work through this top to bottom. Check off each item as you complete it. Items m
 ## Phase 4 — Code Signing
 
 - [ ] Created private certs git repo (e.g. `github.com/YOURORG/app-certs`)
-- [ ] Ran `bundle exec fastlane match init` and set `__MATCH_REPO__`
+- [ ] Ran `bundle exec fastlane match init` and set `MATCH_GIT_URL` in `fastlane/.env`
 - [ ] Ran `bundle exec fastlane match development` — development cert + profile created
 - [ ] Ran `bundle exec fastlane match appstore` — distribution cert + profile created
 - [ ] Xcode shows valid signing identities (no red warnings in project settings)
@@ -141,7 +162,11 @@ Work through this top to bottom. Check off each item as you complete it. Items m
 
 ## Phase 10 — CI/CD (Optional but Recommended)
 
-- [ ] GitHub Actions: `MATCH_PASSWORD`, `APP_STORE_CONNECT_API_KEY_*` secrets set in repo settings
+- [ ] GitHub Actions secrets set in repo Settings → Secrets → Actions:
+  - [ ] `MATCH_PASSWORD`, `MATCH_GIT_URL`, `MATCH_GIT_PRIVATE_KEY`
+  - [ ] `APPLE_ID`, `APPLE_TEAM_ID`
+  - [ ] `APP_STORE_CONNECT_API_KEY_ID`, `APP_STORE_CONNECT_API_KEY_ISSUER_ID`, `APP_STORE_CONNECT_API_KEY_CONTENT`
+  - [ ] `KEYCHAIN_PASSWORD`
 - [ ] `ci.yml` workflow runs on PRs and passes
 - [ ] `release.yml` workflow triggers on version tag and uploads to TestFlight
 - [ ] Optional: Xcode Cloud configured as alternative CI

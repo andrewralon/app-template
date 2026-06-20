@@ -36,10 +36,11 @@ fastlane/
 
 ```ruby
 app_identifier "__BUNDLE_ID__"
-apple_id "__APPLE_ID__"
-team_id "__TEAM_ID__"
-itc_team_id "__TEAM_ID__"  # same unless you're in multiple teams
+apple_id ENV.fetch("APPLE_ID", "")    # set in fastlane/.env
+team_id ENV.fetch("APPLE_TEAM_ID", "")
 ```
+
+`__BUNDLE_ID__` is replaced by `init.sh`. `APPLE_ID` and `APPLE_TEAM_ID` come from `fastlane/.env` (gitignored) or CI environment variables — never committed to the repo.
 
 ---
 
@@ -55,9 +56,9 @@ bundle exec fastlane match init
 
 When prompted:
 - Storage mode: `git`
-- Git URL: `__MATCH_REPO__` (SSH URL to your private certs repo)
+- Git URL: your SSH certs repo URL (e.g. `git@github.com:yourorg/app-certs.git`)
 
-This creates `fastlane/Matchfile`.
+This creates `fastlane/Matchfile`. The `init.sh` wizard handles this automatically and pre-fills `MATCH_GIT_URL` in `fastlane/.env`.
 
 ### Create Certificates
 
@@ -99,12 +100,15 @@ bundle exec fastlane match appstore
 ### Matchfile
 
 ```ruby
-git_url "__MATCH_REPO__"
+git_url ENV.fetch("MATCH_GIT_URL", "")  # set in fastlane/.env or CI secrets
 storage_mode "git"
-type "development"           # default type
-app_identifier "__BUNDLE_ID__"
-username "__APPLE_ID__"
+app_identifier ["__BUNDLE_ID__"]
+username ENV.fetch("APPLE_ID", "")
+team_id ENV.fetch("APPLE_TEAM_ID", "")
+readonly(is_ci)
 ```
+
+`MATCH_GIT_URL`, `APPLE_ID`, and `APPLE_TEAM_ID` are read from environment variables — not committed to the repo. Set them in `fastlane/.env` locally and as GitHub Actions secrets in CI.
 
 ---
 
@@ -273,11 +277,19 @@ platform :ios do
   end
 
   private_lane :app_store_connect_api_key do
-    app_store_connect_api_key(
-      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
-      issuer_id: ENV["APP_STORE_CONNECT_API_KEY_ISSUER_ID"],
-      key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
-    )
+    key_id    = ENV.fetch("APP_STORE_CONNECT_API_KEY_ID")
+    issuer_id = ENV.fetch("APP_STORE_CONNECT_API_KEY_ISSUER_ID")
+    if ENV["APP_STORE_CONNECT_API_KEY_PATH"] && File.exist?(ENV["APP_STORE_CONNECT_API_KEY_PATH"])
+      # Local: read from .p8 file on disk
+      app_store_connect_api_key(key_id: key_id, issuer_id: issuer_id,
+        key_filepath: ENV.fetch("APP_STORE_CONNECT_API_KEY_PATH"),
+        is_key_content_base64: false)
+    else
+      # CI: read from base64-encoded secret
+      app_store_connect_api_key(key_id: key_id, issuer_id: issuer_id,
+        key_content: ENV.fetch("APP_STORE_CONNECT_API_KEY_CONTENT"),
+        is_key_content_base64: true)
+    end
   end
 
   error do |lane, exception|

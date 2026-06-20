@@ -22,7 +22,10 @@ Set these in GitHub → your repo → Settings → Secrets and Variables → Act
 | Secret Name | Value |
 |---|---|
 | `MATCH_PASSWORD` | Passphrase for fastlane match git repo |
+| `MATCH_GIT_URL` | SSH URL of the private match certs repo (e.g. `git@github.com:org/certs.git`) |
 | `MATCH_GIT_PRIVATE_KEY` | SSH private key with access to the match certs repo |
+| `APPLE_ID` | Apple ID email for App Store Connect (e.g. `dev@example.com`) |
+| `APPLE_TEAM_ID` | 10-char Apple Developer Team ID (e.g. `ABCD123456`) |
 | `APP_STORE_CONNECT_API_KEY_ID` | Key ID from App Store Connect API |
 | `APP_STORE_CONNECT_API_KEY_ISSUER_ID` | Issuer ID from App Store Connect API |
 | `APP_STORE_CONNECT_API_KEY_CONTENT` | Base64-encoded contents of the `.p8` key file |
@@ -111,6 +114,9 @@ jobs:
       - name: Sync development signing
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: bundle exec fastlane sync_dev_signing
 
       - name: Run tests
@@ -183,6 +189,9 @@ jobs:
       - name: Build and upload to TestFlight
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}

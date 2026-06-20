@@ -1,23 +1,24 @@
 # fastlane/Deliverfile
-# Default configuration for `deliver` (upload_to_app_store).
-# Used when running: bundle exec fastlane deliver
+# Default configuration for deliver (upload_to_app_store).
 
 app_identifier "__BUNDLE_ID__"
-username "__APPLE_ID__"
+username ENV.fetch("APPLE_ID", "")
 
 submit_for_review true
 automatic_release false
 force true
 
-# Paths
+# App Store metadata paths
 screenshots_path "fastlane/screenshots"
 metadata_path "fastlane/metadata"
 
-# Review Notes (provide login credentials if app requires sign-in)
+# Support and Privacy URLs (populated by init.sh via GitHub Pages)
+# These become the URLs shown on your App Store listing.
+support_url "__SUPPORT_URL__"
+privacy_url "__PRIVACY_URL__"
+
+# Review information
 # submission_information({
 #   export_compliance_uses_encryption: false,
 #   add_id_info_uses_idfa: false
 # })
-
-# Languages
-# default_language "en-US"

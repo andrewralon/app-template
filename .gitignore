@@ -38,8 +38,9 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/screenshots/**/*.jpg
 fastlane/test_output/
-fastlane/.env          # local secrets — never commit
-fastlane/.env.*        # any .env variant
+fastlane/.env            # local secrets — never commit
+fastlane/.env.*          # any .env variant
+!fastlane/.env.template  # but DO commit the template
 
 # ── Credentials & Secrets ─────────────────────────────────────────────────────
 

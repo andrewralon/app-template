@@ -62,6 +62,8 @@ Open [_setup/CHECKLIST.md](_setup/CHECKLIST.md) and work through it top to botto
 
 ## Template Placeholders
 
+**File placeholders** — replaced in committed files by `rename.sh` / `init.sh`:
+
 | Placeholder | Example | Description |
 |---|---|---|
 | `__APP_NAME__` | `MyGreatApp` | Xcode target / Swift type name (PascalCase, no spaces) |
@@ -69,9 +71,17 @@ Open [_setup/CHECKLIST.md](_setup/CHECKLIST.md) and work through it top to botto
 | `__BUNDLE_ID__` | `com.acme.mygreatapp` | Reverse-DNS bundle identifier |
 | `__ORG_IDENTIFIER__` | `com.acme` | Bundle ID prefix |
 | `__TEAM_ID__` | `ABC123DEF4` | 10-char Apple Developer Team ID |
-| `__APPLE_ID__` | `dev@acme.com` | Apple ID used for App Store Connect |
-| `__MATCH_REPO__` | `git@github.com:acme/certs.git` | Private git repo for fastlane match |
 | `__YEAR__` | `2026` | Current year for copyright |
+
+**Env vars** — written to `fastlane/.env` only, never committed:
+
+| Variable | Description |
+|---|---|
+| `APPLE_ID` | Apple ID email for App Store Connect |
+| `APPLE_TEAM_ID` | 10-char Apple Developer Team ID (same value as `__TEAM_ID__`, used by fastlane) |
+| `MATCH_GIT_URL` | SSH URL of private git repo for fastlane match certs |
+| `MATCH_PASSWORD` | Passphrase to encrypt the certs repo |
+| `APP_STORE_CONNECT_API_KEY_*` | App Store Connect API key (see `fastlane/.env.template`) |
 
 ## Directory Structure
 

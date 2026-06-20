@@ -9,9 +9,10 @@
 #     "__BUNDLE_ID__=com.acme.weathernow" \
 #     "__ORG_IDENTIFIER__=com.acme" \
 #     "__TEAM_ID__=ABCD123456" \
-#     "__APPLE_ID__=dev@acme.com" \
-#     "__MATCH_REPO__=git@github.com:acme/certs.git" \
 #     "__YEAR__=2026"
+#
+# Note: APPLE_ID and MATCH_GIT_URL are NOT file placeholders — they go in
+# fastlane/.env only and are never committed to the repo.
 
 set -euo pipefail
 
@@ -39,7 +40,7 @@ done
 echo ""
 
 # --- File extensions to process ---
-EXTENSIONS=("swift" "yml" "yaml" "md" "plist" "rb" "sh" "json" "txt" "xcconfig" "strings")
+EXTENSIONS=("swift" "yml" "yaml" "md" "plist" "rb" "sh" "json" "txt" "xcconfig" "strings" "html" "css" "js")
 
 # --- Build find arguments ---
 FIND_ARGS=()
@@ -110,3 +111,6 @@ echo ""
 echo "Next steps:"
 echo "  1. cd App && xcodegen generate"
 echo "  2. open App/${replacements[__APP_NAME__]:-__APP_NAME__}.xcodeproj"
+echo ""
+echo "Note: APPLE_ID and MATCH_GIT_URL are not file placeholders — they belong"
+echo "      in fastlane/.env only and are pre-filled there by init.sh."

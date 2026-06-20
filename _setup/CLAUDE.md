@@ -47,9 +47,8 @@ _setup/scripts/rename.sh \
   "__BUNDLE_ID__=com.yourname.weathernow" \
   "__ORG_IDENTIFIER__=com.yourname" \
   "__TEAM_ID__=ABCD123456" \
-  "__APPLE_ID__=dev@yourname.com" \
-  "__MATCH_REPO__=git@github.com:yourorg/certs.git" \
   "__YEAR__=2026"
+# APPLE_ID and MATCH_GIT_URL are NOT file placeholders — they go in fastlane/.env only.
 ```
 
 Then rename the actual directory and files:
@@ -130,7 +129,7 @@ cd /path/to/repo && bundle install
 
 # Initialize match (only first time — creates the certs repo structure)
 bundle exec fastlane match init
-# Prompts: storage mode (git), git URL (__MATCH_REPO__)
+# Prompts: storage mode (git), git URL (use the value from MATCH_GIT_URL in fastlane/.env)
 
 # Create development certificates
 bundle exec fastlane match development
