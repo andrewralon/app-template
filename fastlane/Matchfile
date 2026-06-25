@@ -18,8 +18,5 @@ app_identifier ["__BUNDLE_ID__"]
 username ENV.fetch("APPLE_ID", "")
 team_id ENV.fetch("APPLE_TEAM_ID", "")
 
-# Fetch certs in read-only mode when running in CI
-readonly(is_ci)
-
 # Platform: ios, macos, tvos, watchos
 platform "ios"

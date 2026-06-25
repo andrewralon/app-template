@@ -184,3 +184,4 @@ chmod +x _setup/scripts/init.sh && ./_setup/scripts/init.sh
 - [ ] App Store listing updated with any new screenshots
 - [ ] Analytics / crash reporting SDK integrated (if desired)
 - [ ] Feedback channel set up (email, Discord, etc.)
+- [ ] Run `_setup/scripts/cleanup.sh` and commit — removes setup scaffolding from the app repo
