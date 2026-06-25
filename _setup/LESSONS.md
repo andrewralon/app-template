@@ -121,3 +121,33 @@ It removes `_setup/`, removes the root `CLAUDE.md` (template agent instructions)
 **Root cause:** The rename script's `find` command filters by file extension (`.swift`, `.yml`, `.rb`, etc.). Fastlane's convention files have no extension, so they are silently skipped.
 
 **Fix applied:** Added a `NAMED_FILES` array to `rename.sh` with `("Fastfile" "Appfile" "Matchfile" "Deliverfile" "Snapfile" "Gymfile" "Scanfile" "Screenshotfile")` and appended `-o -name "$name"` entries to the find `FIND_ARGS`. Both the template and the 7-sim app had placeholders manually replaced with `sed`.
+
+---
+
+## 10. File/directory renames in `rename.sh` used plain `mv`, losing git history
+
+**Symptom:** After running `rename.sh`, renamed files (e.g. `__APP_NAME__App.swift` → `sevensimApp.swift`) appear as delete + add in git history rather than a tracked rename. `git log --follow` can't trace the file's lineage.
+
+**Root cause:** `rename.sh` used plain `mv` for directory and file renames. Git only tracks renames when `git mv` is used (or when git detects similarity above its rename threshold, which isn't guaranteed).
+
+**Fix applied:** Added a `git_mv()` helper to `rename.sh` that calls `git mv` when inside a git repo, falling back to plain `mv` otherwise. The rename script now always produces clean rename entries in git history.
+
+**Recommended setup flow going forward:**
+```bash
+# Clone template directly into the new app directory
+git clone https://github.com/andrewralon/app-template ~/Documents/GitHub/7-sim
+cd ~/Documents/GitHub/7-sim
+
+# Point to the new app remote (create the GitHub repo first)
+git remote set-url origin https://github.com/andrewralon/7-sim.git
+
+# Run rename (uses git mv — renames are staged automatically)
+_setup/scripts/rename.sh "__APP_NAME__=sevensim" ...
+
+# Generate project and commit everything
+cd App && xcodegen generate && cd ..
+git add .
+git commit -m "Initialize from app-template"
+git push -u origin main
+```
+This replaces the rsync + git init approach used in the first 7-sim setup.

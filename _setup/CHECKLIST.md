@@ -2,6 +2,8 @@
 
 Work through this top to bottom. Check off each item as you complete it. Items marked ⚠️ require waiting on Apple — plan around them.
 
+> **Hit a snag?** Check `_setup/LESSONS.md` first — it documents known issues and fixes discovered during real use. If you find something new, add it there.
+
 ---
 
 ## Phase 0 — Prerequisites

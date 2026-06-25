@@ -42,6 +42,18 @@ if [ ${#keys_arr[@]} -eq 0 ]; then
   exit 1
 fi
 
+# --- Use git mv when inside a git repo so renames appear in history ---
+in_git_repo=0
+git -C "$REPO_ROOT" rev-parse --git-dir > /dev/null 2>&1 && in_git_repo=1
+
+git_mv() {
+  if [ $in_git_repo -eq 1 ]; then
+    git -C "$REPO_ROOT" mv "$1" "$2"
+  else
+    mv "$1" "$2"
+  fi
+}
+
 echo "Repo root: $REPO_ROOT"
 echo "Replacements:"
 for i in "${!keys_arr[@]}"; do
@@ -105,7 +117,7 @@ if [ -n "$app_name_value" ]; then
     base="$(basename "$dir")"
     new_base="${base//__APP_NAME__/$app_name_value}"
     if [ "$base" != "$new_base" ]; then
-      mv "$dir" "$parent/$new_base"
+      git_mv "$dir" "$parent/$new_base"
       echo "  Renamed dir: $dir → $parent/$new_base"
     fi
   done < <(find "$REPO_ROOT/App" -depth -type d -name "*__APP_NAME__*" 2>/dev/null | sort -r)
@@ -120,7 +132,7 @@ if [ -n "$app_name_value" ]; then
     base="$(basename "$file")"
     new_base="${base//__APP_NAME__/$app_name_value}"
     if [ "$base" != "$new_base" ]; then
-      mv "$file" "$parent/$new_base"
+      git_mv "$file" "$parent/$new_base"
       echo "  Renamed file: $file → $parent/$new_base"
     fi
   done < <(find "$REPO_ROOT/App" -type f -name "*__APP_NAME__*" 2>/dev/null)

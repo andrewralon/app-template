@@ -2,6 +2,12 @@
 
 You are helping a developer use this repository as a template to build and ship an iOS or macOS app. This file gives you the lay of the land; `_setup/CLAUDE.md` has detailed step-by-step agent instructions.
 
+## Known Issues & Lessons Learned
+
+Before starting, read `_setup/LESSONS.md`. It documents every issue discovered during real use of this template — broken scripts, missing prerequisites, fastlane quirks, and the recommended setup flow. Following it will save you from repeating solved problems.
+
+When you hit a new issue or deviation during setup, document it in `_setup/LESSONS.md` using the same format (symptom → root cause → fix applied → suggested template improvement).
+
 ## What This Repo Is
 
 A fill-in-the-blank template for Swift/SwiftUI apps targeting iOS 17+ and/or macOS 14+. The developer using it has varying levels of iOS experience — read the checklist and their questions carefully to calibrate your explanations.
