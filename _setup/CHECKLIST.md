@@ -57,9 +57,9 @@ chmod +x _setup/scripts/init.sh && ./_setup/scripts/init.sh
 - [ ] Opened `App/[AppName].xcodeproj` in Xcode — builds with no errors
 - [ ] Filled in remaining secrets in `fastlane/.env`:
   - [ ] `MATCH_PASSWORD` — passphrase for the certs repo
-  - [ ] `APP_STORE_CONNECT_API_KEY_ID`
-  - [ ] `APP_STORE_CONNECT_API_KEY_ISSUER_ID`
-  - [ ] `APP_STORE_CONNECT_API_KEY_PATH` — path to `.p8` key file
+  - [ ] `APP_STORE_CONNECT_KEY_ID`
+  - [ ] `APP_STORE_CONNECT_KEY_ISSUER_ID`
+  - [ ] `APP_STORE_CONNECT_KEY_PATH` — path to `.p8` key file
 - [ ] Customized `docs/support.html` — replaced placeholder FAQ with real content
 - [ ] Reviewed `docs/privacy.html` — updated to reflect actual data practices
 - [ ] Verified GitHub Pages live: `curl https://[username].github.io/[repo]/support`
@@ -167,7 +167,7 @@ chmod +x _setup/scripts/init.sh && ./_setup/scripts/init.sh
 - [ ] GitHub Actions secrets set in repo Settings → Secrets → Actions:
   - [ ] `MATCH_PASSWORD`, `MATCH_GIT_URL`, `MATCH_GIT_PRIVATE_KEY`
   - [ ] `APPLE_ID`, `APPLE_TEAM_ID`
-  - [ ] `APP_STORE_CONNECT_API_KEY_ID`, `APP_STORE_CONNECT_API_KEY_ISSUER_ID`, `APP_STORE_CONNECT_API_KEY_CONTENT`
+  - [ ] `APP_STORE_CONNECT_KEY_ID`, `APP_STORE_CONNECT_KEY_ISSUER_ID`, `APP_STORE_CONNECT_API_KEY_CONTENT`
   - [ ] `KEYCHAIN_PASSWORD`
 - [ ] `ci.yml` workflow runs on PRs and passes
 - [ ] `release.yml` workflow triggers on version tag and uploads to TestFlight

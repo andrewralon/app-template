@@ -44,9 +44,9 @@ There are two categories: **file placeholders** (replaced by `rename.sh` in comm
 | `APPLE_TEAM_ID` | 10-char Apple Developer Team ID |
 | `MATCH_GIT_URL` | SSH URL to the private certs repo for fastlane match |
 | `MATCH_PASSWORD` | Passphrase to encrypt/decrypt the match certs repo |
-| `APP_STORE_CONNECT_API_KEY_ID` | API key ID from App Store Connect |
-| `APP_STORE_CONNECT_API_KEY_ISSUER_ID` | API key issuer ID |
-| `APP_STORE_CONNECT_API_KEY_PATH` | Local path to the `.p8` key file |
+| `APP_STORE_CONNECT_KEY_ID` | API key ID from App Store Connect |
+| `APP_STORE_CONNECT_KEY_ISSUER_ID` | API key issuer ID |
+| `APP_STORE_CONNECT_KEY_PATH` | Local path to the `.p8` key file |
 | `APP_STORE_CONNECT_API_KEY_CONTENT` | Base64-encoded `.p8` contents (for CI) |
 
 Use `_setup/scripts/rename.sh` to replace file placeholders. For env vars, copy `fastlane/.env.template` → `fastlane/.env` and fill in the values. `init.sh` does both automatically.

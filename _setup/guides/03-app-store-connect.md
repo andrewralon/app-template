@@ -134,8 +134,8 @@ For CI/CD automation (GitHub Actions, Xcode Cloud, fastlane), you need an API ke
 6. Note the **Key ID** and **Issuer ID** shown on the page
 
 Store these securely:
-- Key ID: `APP_STORE_CONNECT_API_KEY_ID`
-- Issuer ID: `APP_STORE_CONNECT_API_KEY_ISSUER_ID`
+- Key ID: `APP_STORE_CONNECT_KEY_ID`
+- Issuer ID: `APP_STORE_CONNECT_KEY_ISSUER_ID`
 - Key file contents: `APP_STORE_CONNECT_API_KEY_CONTENT` (base64 encode: `cat AuthKey_XXXXX.p8 | base64`)
 
 Add these as GitHub Actions secrets. See [10-github-actions.md](10-github-actions.md).

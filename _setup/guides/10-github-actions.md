@@ -26,8 +26,8 @@ Set these in GitHub → your repo → Settings → Secrets and Variables → Act
 | `MATCH_GIT_PRIVATE_KEY` | SSH private key with access to the match certs repo |
 | `APPLE_ID` | Apple ID email for App Store Connect (e.g. `dev@example.com`) |
 | `APPLE_TEAM_ID` | 10-char Apple Developer Team ID (e.g. `ABCD123456`) |
-| `APP_STORE_CONNECT_API_KEY_ID` | Key ID from App Store Connect API |
-| `APP_STORE_CONNECT_API_KEY_ISSUER_ID` | Issuer ID from App Store Connect API |
+| `APP_STORE_CONNECT_KEY_ID` | Key ID from App Store Connect API |
+| `APP_STORE_CONNECT_KEY_ISSUER_ID` | Issuer ID from App Store Connect API |
 | `APP_STORE_CONNECT_API_KEY_CONTENT` | Base64-encoded contents of the `.p8` key file |
 | `KEYCHAIN_PASSWORD` | Any random strong password (used to create a temp keychain on CI) |
 
@@ -192,8 +192,8 @@ jobs:
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: bundle exec fastlane beta

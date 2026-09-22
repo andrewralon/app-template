@@ -217,8 +217,8 @@ xcodebuild -exportArchive \
 # Upload via altool or xcrun
 xcrun altool --upload-app \
   -f /tmp/__APP_NAME__-ipa/__APP_NAME__.ipa \
-  --apiKey $APP_STORE_CONNECT_API_KEY_ID \
-  --apiIssuer $APP_STORE_CONNECT_API_KEY_ISSUER_ID \
+  --apiKey $APP_STORE_CONNECT_KEY_ID \
+  --apiIssuer $APP_STORE_CONNECT_KEY_ISSUER_ID \
   --type ios
 ```
 

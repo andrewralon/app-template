@@ -12,8 +12,8 @@ Set environment variables (or create `fastlane/.env`):
 
 ```bash
 MATCH_PASSWORD=your_match_passphrase
-APP_STORE_CONNECT_API_KEY_ID=XXXXXXXXXX
-APP_STORE_CONNECT_API_KEY_ISSUER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+APP_STORE_CONNECT_KEY_ID=XXXXXXXXXX
+APP_STORE_CONNECT_KEY_ISSUER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 APP_STORE_CONNECT_API_KEY_CONTENT=LS0tLS1CRUdJTi4uLg==  # base64 .p8 contents
 ```
 

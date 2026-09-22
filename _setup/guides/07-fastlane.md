@@ -277,12 +277,12 @@ platform :ios do
   end
 
   private_lane :app_store_connect_api_key do
-    key_id    = ENV.fetch("APP_STORE_CONNECT_API_KEY_ID")
-    issuer_id = ENV.fetch("APP_STORE_CONNECT_API_KEY_ISSUER_ID")
-    if ENV["APP_STORE_CONNECT_API_KEY_PATH"] && File.exist?(ENV["APP_STORE_CONNECT_API_KEY_PATH"])
+    key_id    = ENV.fetch("APP_STORE_CONNECT_KEY_ID")
+    issuer_id = ENV.fetch("APP_STORE_CONNECT_KEY_ISSUER_ID")
+    if ENV["APP_STORE_CONNECT_KEY_PATH"] && File.exist?(ENV["APP_STORE_CONNECT_KEY_PATH"])
       # Local: read from .p8 file on disk
       app_store_connect_api_key(key_id: key_id, issuer_id: issuer_id,
-        key_filepath: ENV.fetch("APP_STORE_CONNECT_API_KEY_PATH"),
+        key_filepath: ENV.fetch("APP_STORE_CONNECT_KEY_PATH"),
         is_key_content_base64: false)
     else
       # CI: read from base64-encoded secret
@@ -309,8 +309,8 @@ Never hardcode credentials in the Fastfile. Set them as environment variables:
 ```bash
 # In your shell or CI environment:
 export MATCH_PASSWORD="your_match_passphrase"
-export APP_STORE_CONNECT_API_KEY_ID="ABCD123456"
-export APP_STORE_CONNECT_API_KEY_ISSUER_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+export APP_STORE_CONNECT_KEY_ID="ABCD123456"
+export APP_STORE_CONNECT_KEY_ISSUER_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 export APP_STORE_CONNECT_API_KEY_CONTENT="LS0tLS1CRUdJTi4uLg=="  # base64-encoded .p8
 ```
 
@@ -319,8 +319,8 @@ For local development, use a `.env` file in the `fastlane/` directory (gitignore
 ```bash
 # fastlane/.env
 MATCH_PASSWORD=your_match_passphrase
-APP_STORE_CONNECT_API_KEY_ID=ABCD123456
-APP_STORE_CONNECT_API_KEY_ISSUER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+APP_STORE_CONNECT_KEY_ID=ABCD123456
+APP_STORE_CONNECT_KEY_ISSUER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 APP_STORE_CONNECT_API_KEY_CONTENT=LS0tLS1CRUdJTi4uLg==
 ```
 
@@ -343,8 +343,8 @@ cat ~/Downloads/AuthKey_ABCD123456.p8 | base64 | pbcopy
 # (this copies the base64 string to your clipboard)
 
 # 3. Set environment variables:
-export APP_STORE_CONNECT_API_KEY_ID="ABCD123456"
-export APP_STORE_CONNECT_API_KEY_ISSUER_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+export APP_STORE_CONNECT_KEY_ID="ABCD123456"
+export APP_STORE_CONNECT_KEY_ISSUER_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 export APP_STORE_CONNECT_API_KEY_CONTENT="<paste base64 here>"
 ```
 
