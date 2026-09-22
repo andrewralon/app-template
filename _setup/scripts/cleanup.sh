@@ -15,9 +15,20 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-APP_DISPLAY_NAME="$(grep -m1 'PRODUCT_NAME' "$REPO_ROOT/App/project.yml" 2>/dev/null | sed 's/.*PRODUCT_NAME: *//' | tr -d '"' || echo 'My App')"
+
+# Target name — what XcodeGen actually names App/<name>.xcodeproj after.
+APP_TARGET_NAME="$(grep -m1 '^name:' "$REPO_ROOT/App/project.yml" 2>/dev/null | sed 's/^name: *//' | tr -d '"')"
+[ -z "$APP_TARGET_NAME" ] && APP_TARGET_NAME="MyApp"
+
+# Display name — from Info.plist (a plain string value, no build-setting
+# interpolation to trip over). Located dynamically since the parent
+# directory name (Sources/<AppName>/Resources/) varies per app.
+INFO_PLIST="$(find "$REPO_ROOT/App/Sources" -maxdepth 3 -name Info.plist 2>/dev/null | head -1)"
+APP_DISPLAY_NAME="$(grep -A1 'CFBundleDisplayName' "$INFO_PLIST" 2>/dev/null | tail -1 | sed 's/.*<string>//; s/<\/string>.*//')"
+[ -z "$APP_DISPLAY_NAME" ] && APP_DISPLAY_NAME="My App"
 
 echo "Cleaning up template scaffolding in: $REPO_ROOT"
+echo "App target name detected: $APP_TARGET_NAME"
 echo "App display name detected: $APP_DISPLAY_NAME"
 echo ""
 
@@ -52,7 +63,7 @@ brew install xcodegen swiftformat swiftlint
 cd App && xcodegen generate
 \`\`\`
 
-Open \`App/$APP_DISPLAY_NAME.xcodeproj\` in Xcode and run (⌘R).
+Open \`App/$APP_TARGET_NAME.xcodeproj\` in Xcode and run (⌘R).
 
 ## Releasing
 

@@ -189,3 +189,15 @@ A direct, hand-signed call to `POST /v1/apps` (bypassing `produce`/fastlane enti
 **Fix applied:** Documented the gap in `_setup/guides/12-app-icons-screenshots.md`, right after the "Adding to the Project" steps, so anyone using `rename.sh` directly is told to generate or add a placeholder icon before their first `fastlane beta`/`release`.
 
 **Suggested template improvement:** `rename.sh` could check for and generate a placeholder `Icon-1024.png` itself (or at least print a warning) when one doesn't already exist, rather than relying on developers to have read this note.
+
+---
+
+## 14. `cleanup.sh` conflated the Xcode target name and display name into one variable
+
+**Symptom:** Two bugs traced to the same root cause. First, the rewritten `README.md` told the user to `Open App/$APP_DISPLAY_NAME.xcodeproj`, but XcodeGen always names the generated project after `project.yml`'s `name:` field (the target name, e.g. `WeatherNow`), never `PRODUCT_NAME` (e.g. `Weather Now`) — whenever the display name contains a space, the README pointed at a `.xcodeproj` path that doesn't exist. Second, the single-line `grep -m1 'PRODUCT_NAME' project.yml` used to derive that value was fragile: if `PRODUCT_NAME` wasn't present as a plain single-line value for any reason, the grep could match an unrelated comment line instead, and since that line had no literal `PRODUCT_NAME:` to strip, the whole matched line — comment and all — got written as the README's title.
+
+**Root cause:** `cleanup.sh` derived both the target name and the display name from one fragile grep against a single field, treating two genuinely different values (`name:` vs. `PRODUCT_NAME:` in `project.yml`) as interchangeable. (Filed as issue #4.)
+
+**Fix applied:** Derive the two names independently from two reliable sources: `APP_TARGET_NAME` from `project.yml`'s top-level `name:` field (used for the `.xcodeproj` path), and `APP_DISPLAY_NAME` from `Info.plist`'s `CFBundleDisplayName` (used for the README title), located dynamically via `find` since its parent directory varies per app. Verified against both this repo's own unmodified placeholder files and a simulated renamed app (`AppNameHere` / `App Name Here`), confirming the `.xcodeproj` path now actually exists and no comment lines leak into the README.
+
+**Suggested template improvement:** A basic shellcheck/bats test for `cleanup.sh` against a fixture `project.yml` + `Info.plist` would catch this class of regression before it reaches a real app's cleanup run.
