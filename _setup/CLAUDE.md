@@ -287,6 +287,7 @@ Key files you will edit most often:
 
 These steps require the developer to act in a browser or GUI and cannot be automated:
 
+- Creating the App Store Connect app record — no API key role can do this (see [guides/03-app-store-connect.md](guides/03-app-store-connect.md))
 - Enrolling in the Apple Developer Program
 - Signing legal agreements in App Store Connect
 - Two-factor authentication prompts

@@ -8,6 +8,10 @@ App Store Connect is Apple's portal for managing your app's listing, uploads, re
 
 ## Creating a New App
 
+**This step cannot be automated or done via the App Store Connect API — by anyone, with any API key role.** `POST /v1/apps` only supports `GET_COLLECTION`, `GET_INSTANCE`, and `UPDATE`; app-record creation is a permanent platform limitation, not a permissions gap (confirmed with both App Manager and Admin-role keys — same 403 either way). `fastlane produce`/`create_app_online` can create the record, but only through the older, undocumented iTunes Connect API, which requires an interactive Apple ID session and a live 2FA prompt — it cannot run in CI or an agent session. The developer must create the app record themselves, either in the web UI below or by running `produce` interactively in their own terminal.
+
+(Bundle ID / App ID registration is different — that's `POST /v1/bundleIds`, which works fine with a properly-scoped API key and no 2FA. See [01-apple-dev-program.md](01-apple-dev-program.md).)
+
 1. Log in to App Store Connect
 2. Click **My Apps**
 3. Click **+** → **New App**

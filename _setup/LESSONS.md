@@ -151,3 +151,17 @@ git commit -m "Initialize from app-template"
 git push -u origin main
 ```
 This replaces the rsync + git init approach used in the first 7-sim setup.
+
+---
+
+## 11. App Store Connect app record cannot be created via any API key, at any role
+
+**Symptom:** `fastlane produce`/`create_app_online` fails two different ways depending on what's attempted:
+1. Passing `api_key:` directly errors with `Could not find option 'api_key' in the list of available options` — `produce` doesn't accept that parameter at all.
+2. Calling `app_store_connect_api_key` first and then running `produce` falls back to interactive Apple ID username/password + 2FA (a live 6-digit-code prompt) — not something CI or an agent session can complete.
+
+A direct, hand-signed call to `POST /v1/apps` (bypassing `produce`/fastlane entirely) gets `403 FORBIDDEN_ERROR — "The resource 'apps' does not allow 'CREATE'. Allowed operations are: GET_COLLECTION, GET_INSTANCE, UPDATE"`. Confirmed with both an App Manager-role key and a freshly generated Admin-role key — identical error either way.
+
+**Root cause:** The official App Store Connect REST API does not support creating a new app record at all, for any key at any role — a permanent Apple platform limitation, not a permissions gap that a more privileged key fixes. `fastlane produce`'s ability to create an app record goes through the older, undocumented "iTunes Connect" API (`Spaceship::Tunes`), authenticated via a real Apple ID session (hence the 2FA) — never the public API-key-authenticated surface. Bundle ID / App ID registration is a separate endpoint (`POST /v1/bundleIds`) with no such restriction — that one works fine with a properly-scoped key (App Manager is sufficient) and no 2FA.
+
+**Fix applied:** Documented this plainly in `_setup/guides/03-app-store-connect.md` (top of "Creating a New App") and added it to the "What Requires Human Action" list in `_setup/CLAUDE.md`: the ASC app record has to be created either by a human in the App Store Connect web UI, or by the developer running `produce`/`create_app_online` interactively themselves (so they can answer the 2FA prompt in their own terminal) — no API key role gets around this, and it can't be deferred to CI or an agent.
