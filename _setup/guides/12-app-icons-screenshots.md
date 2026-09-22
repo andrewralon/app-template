@@ -42,6 +42,15 @@ Free tools:
 
 Xcode will automatically scale the icon to all required sizes from the single 1024×1024 source.
 
+> **If you ran `_setup/scripts/rename.sh` directly instead of the interactive
+> `init.sh` wizard**, note that placeholder icon generation is a step in
+> `init.sh` only — `rename.sh` doesn't create `Icon-1024.png` for you. The
+> `AppIcon.appiconset` slot will be correctly declared but empty until you add
+> one, and this won't surface until your first TestFlight upload fails with
+> "Missing required icon file" / "Missing Info.plist value ... CFBundleIconName".
+> Generate or drop in a placeholder icon before running `fastlane beta` or
+> `fastlane release`.
+
 ### Generate All Sizes (Optional — Done Automatically)
 
 If you need explicit files for any reason:

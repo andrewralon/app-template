@@ -190,10 +190,10 @@ bundle exec fastlane test
 **Warn the user before running this.** It uploads to Apple's servers.
 
 ```bash
-# Bump build number first
-# Edit App/project.yml → CURRENT_PROJECT_VERSION: <new number>
-# Then regenerate:
-cd App && xcodegen generate
+# No manual build-number bump needed: the `beta` lane reads the last
+# uploaded build number from App Store Connect and passes the increment
+# straight to build_app via xcargs. Editing CURRENT_PROJECT_VERSION in
+# project.yml has no effect on what gets uploaded (see _setup/LESSONS.md #12).
 
 # Upload
 bundle exec fastlane beta
@@ -254,7 +254,10 @@ brew install xcodegen
 ```
 
 ### Build number conflict on upload
-Increment `CURRENT_PROJECT_VERSION` in `App/project.yml`, then regenerate.
+Shouldn't happen under normal use — `beta`/`release` derive the next build number
+from App Store Connect at upload time (see _setup/LESSONS.md #12), not from
+`project.yml`. If it does happen, it usually means a build was uploaded outside
+these lanes; check the actual latest build number in App Store Connect.
 
 ### "Bundle ID not registered"
 Go to developer.apple.com → Identifiers → register the bundle ID explicitly.

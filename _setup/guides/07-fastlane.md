@@ -196,16 +196,23 @@ platform :ios do
   lane :beta do
     sync_release_signing
 
-    increment_build_number(
-      xcodeproj: "App/__APP_NAME__.xcodeproj"
+    # Build number comes from TestFlight, passed via xcargs — NOT
+    # increment_build_number(xcodeproj:), which would write to the
+    # gitignored, XcodeGen-generated .xcodeproj (silently discarded on the
+    # next `xcodegen generate`) or hardcode CFBundleVersion in Info.plist.
+    current_build = latest_testflight_build_number(
+      api_key: app_store_connect_api_key,
+      app_identifier: "__BUNDLE_ID__"
     )
+    next_build = current_build + 1
 
     build_app(
       project: "App/__APP_NAME__.xcodeproj",
       scheme: "__APP_NAME__",
       configuration: "Release",
       output_directory: "build",
-      export_method: "app-store"
+      export_method: "app-store",
+      xcargs: "CURRENT_PROJECT_VERSION=#{next_build}"
     )
 
     upload_to_testflight(
@@ -222,16 +229,19 @@ platform :ios do
 
     sync_release_signing
 
-    increment_build_number(
-      xcodeproj: "App/__APP_NAME__.xcodeproj"
+    current_build = latest_testflight_build_number(
+      api_key: app_store_connect_api_key,
+      app_identifier: "__BUNDLE_ID__"
     )
+    next_build = current_build + 1
 
     build_app(
       project: "App/__APP_NAME__.xcodeproj",
       scheme: "__APP_NAME__",
       configuration: "Release",
       output_directory: "build",
-      export_method: "app-store"
+      export_method: "app-store",
+      xcargs: "CURRENT_PROJECT_VERSION=#{next_build}"
     )
 
     upload_to_app_store(
@@ -352,27 +362,38 @@ export APP_STORE_CONNECT_API_KEY_CONTENT="<paste base64 here>"
 
 ## Incrementing Build Numbers
 
-fastlane can automatically increment the build number. Two strategies:
+**Don't use `increment_build_number(xcodeproj:)` or `commit_version_bump` in this
+template.** Both actions assume the `.xcodeproj` is the committed source of truth
+for the build number — but here, XcodeGen generates and gitignores the
+`.xcodeproj`, and `project.yml` (via `CURRENT_PROJECT_VERSION`) is the real
+source of truth. `increment_build_number` writes the bump into the gitignored
+project (discarded on the next `xcodegen generate`) and can hardcode
+`CFBundleVersion` as a literal into the tracked `Info.plist`, breaking the
+`$(CURRENT_PROJECT_VERSION)` variable substitution.
 
-### From Last Upload
+### From App Store Connect (safe for CI, and the pattern this template uses)
+
+Read the last uploaded build number and pass the increment straight to
+`build_app` as an `xcargs` override — nothing gets written to disk, so there's
+nothing to commit afterward:
 
 ```ruby
-increment_build_number(
-  xcodeproj: "App/__APP_NAME__.xcodeproj"
-  # reads current build number from Xcode and increments it
-)
-```
-
-### From App Store Connect (safe for CI)
-
-```ruby
-latest_build_number = latest_testflight_build_number(
+current_build = latest_testflight_build_number(
   api_key: app_store_connect_api_key,
-  app_identifier: "__BUNDLE_ID__"
+  app_identifier: "__BUNDLE_ID__",
+  # Scope to the current marketing version — Apple tracks build-number
+  # uniqueness per version, so this must match what the template's own
+  # beta/release lanes pass.
+  version: get_version_number(
+    xcodeproj: "App/__APP_NAME__.xcodeproj",
+    target: "__APP_NAME__"
+  )
 )
-increment_build_number(
-  build_number: latest_build_number + 1,
-  xcodeproj: "App/__APP_NAME__.xcodeproj"
+next_build = current_build + 1
+
+build_app(
+  # ...
+  xcargs: "CURRENT_PROJECT_VERSION=#{next_build}"
 )
 ```
 

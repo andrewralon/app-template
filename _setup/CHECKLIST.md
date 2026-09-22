@@ -180,7 +180,7 @@ chmod +x _setup/scripts/init.sh && ./_setup/scripts/init.sh
 
 ## Post-Ship Housekeeping
 
-- [ ] Version bumped in `App/project.yml` (MARKETING_VERSION + CURRENT_PROJECT_VERSION)
+- [ ] MARKETING_VERSION bumped in `App/project.yml` for the next release (CURRENT_PROJECT_VERSION is derived from App Store Connect at upload time by `beta`/`release` — no manual bump needed, see `_setup/LESSONS.md` #12)
 - [ ] CHANGELOG updated
 - [ ] Git tag pushed: `git tag v1.0.0 && git push --tags`
 - [ ] App Store listing updated with any new screenshots

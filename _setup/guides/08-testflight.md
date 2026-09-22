@@ -199,16 +199,23 @@ Each upload to TestFlight must have a higher build number than the previous one.
 | Use CI build number | Predictable | Requires CI |
 | Read from App Store Connect | Always correct | Slower (API call) |
 
-In `fastlane/Fastfile`, the `beta` lane reads from App Store Connect:
+In `fastlane/Fastfile`, the `beta` lane reads from App Store Connect and passes
+the increment to `build_app` via `xcargs` — not `increment_build_number(xcodeproj:)`,
+which would write into the gitignored, XcodeGen-generated `.xcodeproj` (discarded
+on the next `xcodegen generate`) or hardcode `CFBundleVersion` into the tracked
+`Info.plist`. See `_setup/guides/07-fastlane.md` ("Incrementing Build Numbers")
+and `_setup/LESSONS.md` #12 for the full story:
 
 ```ruby
-latest_build = latest_testflight_build_number(
-  api_key: app_store_connect_api_key,
+current_build = latest_testflight_build_number(
+  api_key: app_store_connect_api_key_from_env,
   app_identifier: "__BUNDLE_ID__"
 )
-increment_build_number(
-  build_number: latest_build + 1,
-  xcodeproj: "App/__APP_NAME__.xcodeproj"
+next_build = current_build + 1
+
+build_app(
+  # ...
+  xcargs: "CURRENT_PROJECT_VERSION=#{next_build}"
 )
 ```
 
